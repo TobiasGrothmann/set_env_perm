@@ -179,11 +179,13 @@ fn get_profile() -> io::Result<File> {
     oo.open(profile_path)
 }
 
+#[cfg(target_family = "unix")]
 struct Shell {
     name: &'static str,
     config_files: &'static [&'static str],
 }
 
+#[cfg(target_family = "unix")]
 static SHELLS: &[Shell] = &[
     Shell {
         name: "zsh",
