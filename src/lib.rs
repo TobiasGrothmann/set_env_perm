@@ -165,31 +165,82 @@ pub fn set<T: fmt::Display, U: fmt::Display>(var: T, value: U) -> io::Result<()>
 
 #[cfg(target_family = "unix")]
 fn get_profile() -> io::Result<File> {
-    dirs::home_dir()
-        .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "No home directory"))
-        .and_then(find_profile)
+    let home_dir = dirs::home_dir()
+        .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "No home directory"))?;
+
+    let profile_path = find_profile(home_dir.clone()).unwrap_or_else(|_| {
+        let mut fallback = home_dir;
+        fallback.push(".profile");
+        fallback
+    });
+
+    let mut oo = OpenOptions::new();
+    oo.append(true).create(true);
+    oo.open(profile_path)
 }
 
+struct Shell {
+    name: &'static str,
+    config_files: &'static [&'static str],
+}
+
+static SHELLS: &[Shell] = &[
+    Shell {
+        name: "zsh",
+        config_files: &[".zprofile", ".zshrc", ".zlogin"],
+    },
+    Shell {
+        name: "fish",
+        config_files: &[".config/fish/config.fish"],
+    },
+    Shell {
+        name: "tcsh",
+        config_files: &[".tcshrc", ".cshrc", ".login"],
+    },
+    Shell {
+        name: "csh",
+        config_files: &[".tcshrc", ".cshrc", ".login"],
+    },
+    Shell {
+        name: "ksh",
+        config_files: &[".profile", ".kshrc"],
+    },
+    Shell {
+        name: "bash",
+        config_files: &[".bash_profile", ".bash_login", ".bashrc"],
+    },
+];
+
 #[cfg(target_family = "unix")]
-fn find_profile(mut profile: PathBuf) -> io::Result<File> {
-    profile.push(".bash_profile");
-    let mut oo = OpenOptions::new();
-    oo.append(true).create(false);
-    oo.open(profile.clone())
-        .or_else(|_| {
-            profile.pop();
-            profile.push(".bash_login");
-            oo.open(profile.clone())
-        })
-        .or_else(|_| {
-            profile.pop();
-            profile.push(".profile");
-            oo.open(profile.clone())
-        })
-        .or_else(|_| {
-            profile.pop();
-            profile.push(".bash_profile");
-            oo.create(true);
-            oo.open(profile.clone())
-        })
+fn find_profile(mut home_dir: PathBuf) -> io::Result<PathBuf> {
+    let shell_env = env::var("SHELL").unwrap_or_default();
+
+    let selected_shell = SHELLS
+        .iter()
+        .find(|s| shell_env.contains(s.name))
+        .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "Unsupported shell"))?;
+
+    for config_file in selected_shell.config_files {
+        let mut config_path = home_dir.clone();
+        for part in config_file.split('/') {
+            config_path.push(part);
+        }
+
+        if config_path.exists() {
+            return Ok(config_path);
+        }
+
+        if config_file.contains('/') {
+            if std::fs::create_dir_all(config_path.parent().unwrap()).is_ok() {
+                return Ok(config_path);
+            }
+            return Err(io::Error::new(
+                io::ErrorKind::Other,
+                "Cannot create config directory",
+            ));
+        }
+    }
+
+    home_dir.push(selected_shell.config_files[0]);
+    Ok(home_dir)
 }
