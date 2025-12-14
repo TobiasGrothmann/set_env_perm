@@ -189,7 +189,7 @@ struct Shell {
 static SHELLS: &[Shell] = &[
     Shell {
         name: "zsh",
-        config_files: &[".zprofile", ".zshrc", ".zlogin"],
+        config_files: &[".zshenv", ".zprofile", ".zshrc", ".zlogin"],
     },
     Shell {
         name: "fish",
@@ -201,15 +201,15 @@ static SHELLS: &[Shell] = &[
     },
     Shell {
         name: "csh",
-        config_files: &[".tcshrc", ".cshrc", ".login"],
+        config_files: &[".cshrc", ".tcshrc", ".login"],
     },
     Shell {
         name: "ksh",
-        config_files: &[".profile", ".kshrc"],
+        config_files: &[".kshrc"],
     },
     Shell {
         name: "bash",
-        config_files: &[".bash_profile", ".bash_login", ".bashrc"],
+        config_files: &[".bash_profile", ".bashrc", ".bash_login"],
     },
 ];
 
