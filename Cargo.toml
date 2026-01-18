@@ -1,11 +1,11 @@
 [package]
-name = "set_env"
+name = "set_env_perm"
 version = "1.3.4"
-authors = ["CGQAQ <m.jason.liu@outlook.com>"]
+authors = ["CGQAQ <m.jason.liu@outlook.com>", "Tobias Grothmann"]
 edition = "2021"
 description = "Sets environment variables permanently across all major platforms"
-documentation = "https://docs.rs/set_env"
-repository = "https://github.com/CGQAQ/set_env"
+documentation = "https://docs.rs/set_env_perm"
+repository = "https://github.com/TobiasGrothmann/set_env_perm"
 readme = "README.md"
 license = "MIT"
 keywords = ["env", "environment", "variable"]

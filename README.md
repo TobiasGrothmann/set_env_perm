@@ -2,7 +2,7 @@
 
 This crate allows you to permanently set environment variables
 
-## Based on [env_perm](https://github.com/freesig/env_perm)
+## Based on [set_env](https://github.com/CGQAQ/set_env)
 
 ## Examples
 ```rust
