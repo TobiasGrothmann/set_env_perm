@@ -1,6 +1,6 @@
 [package]
 name = "set_env_perm"
-version = "1.3.4"
+version = "2.0.0"
 authors = ["CGQAQ <m.jason.liu@outlook.com>", "Tobias Grothmann"]
 edition = "2021"
 description = "Sets environment variables permanently across all major platforms"
